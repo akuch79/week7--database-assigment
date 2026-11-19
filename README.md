@@ -6,6 +6,7 @@ This repository contains my solutions for the PLP Python Week 7 assignment on Py
 
 ### Files
 
+- **`answer.sql`** — Contains the combined code for all three Python list exercises: the list warmup, interactive shopping list manager, and list report. Although the requested filename ends in `.sql`, the contents are Python code.
 - **`list_warmup.py`** — Demonstrates list indexing, adding items with `append()`, removing items with `remove()`, and counting items using `len()`.
 - **`shopping_list.py`** — Implements an interactive shopping list manager that allows users to add, remove, and show items, or quit the program.
 - **`list_report.py`** — Prints a numbered list of items, counts item names with more than four letters, and finds the longest item name using a loop.
@@ -17,4 +18,4 @@ Checking whether an item exists in a list before using `.remove()` helps prevent
 
 ## Author
 
-PLP Software Engineering Student
+Margaret
