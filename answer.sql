@@ -1,75 +1,68 @@
-# Combined Python solutions for the Week 7 lists assignment.
-# Sections: list warmup, shopping list, and list report.
+-- Week 7 Assignment: Database Design and Normalization
+-- Student Name:
+-- Date:
+-- SQL dialect: MySQL
+-- The prompt provided the required columns but did not include source rows.
+-- The rows below are illustrative; replace them with the assignment's sample data if available.
 
-# --- list_warmup.py ---
-fruits = ["mango", "banana", "orange", "apple"]
+-- ==========================================
+-- QUESTION 1: ACHIEVING FIRST NORMAL FORM (1NF)
+-- ==========================================
+-- Each row contains exactly one product for an order. Product is no longer
+-- stored as a repeating list, and every field contains a single value.
 
-print("First fruit:", fruits[0])
-print("Last fruit:", fruits[-1])
+DROP TABLE IF EXISTS ProductDetail_NF;
 
-fruits.append("pineapple")
-print("After append:", fruits)
+CREATE TABLE ProductDetail_NF (
+    OrderID       INT          NOT NULL,
+    CustomerName  VARCHAR(100) NOT NULL,
+    Product       VARCHAR(100) NOT NULL,
+    Quantity      INT          NOT NULL,
+    PRIMARY KEY (OrderID, Product),
+    CHECK (Quantity > 0)
+);
 
-fruits.remove("banana")
-print("After remove:", fruits)
+-- One row per product in each order (illustrative sample data).
+INSERT INTO ProductDetail_NF (OrderID, CustomerName, Product, Quantity) VALUES
+    (1001, 'Ava Patel', 'Notebook', 2),
+    (1001, 'Ava Patel', 'Pen', 5),
+    (1002, 'Noah Kim', 'Backpack', 1),
+    (1002, 'Noah Kim', 'Notebook', 3);
 
-print("Number of fruits remaining:", len(fruits))
+-- ==========================================
+-- QUESTION 2: ACHIEVING SECOND NORMAL FORM (2NF)
+-- ==========================================
+-- In the 1NF table, CustomerName depends on OrderID alone, not on the full
+-- composite key (OrderID, Product). Move it to Orders. Product and Quantity
+-- remain in OrderItems, where they depend on the complete key.
 
-# --- shopping_list.py ---
-shopping_list = []
+DROP TABLE IF EXISTS OrderItems;
+DROP TABLE IF EXISTS Orders;
 
-while True:
-    print("\nShopping List Menu: add / remove / show / done")
-    choice = input("Choose an action: ").strip().lower()
+CREATE TABLE Orders (
+    OrderID       INT          NOT NULL,
+    CustomerName  VARCHAR(100) NOT NULL,
+    PRIMARY KEY (OrderID)
+);
 
-    if choice == "add":
-        item = input("Enter item to add: ").strip()
-        if item:
-            shopping_list.append(item)
-            print(f"Added: {item}")
-        else:
-            print("Item name cannot be empty.")
+CREATE TABLE OrderItems (
+    OrderID   INT          NOT NULL,
+    Product   VARCHAR(100) NOT NULL,
+    Quantity  INT          NOT NULL,
+    PRIMARY KEY (OrderID, Product),
+    CONSTRAINT fk_orderitems_orders
+        FOREIGN KEY (OrderID) REFERENCES Orders (OrderID),
+    CHECK (Quantity > 0)
+);
 
-    elif choice == "remove":
-        item = input("Enter item to remove: ").strip()
-        if item in shopping_list:
-            shopping_list.remove(item)
-            print(f"Removed: {item}")
-        else:
-            print("That item is not on your list.")
+-- Insert each order once.
+INSERT INTO Orders (OrderID, CustomerName) VALUES
+    (1001, 'Ava Patel'),
+    (1002, 'Noah Kim');
 
-    elif choice == "show":
-        if shopping_list:
-            print("Your shopping list:")
-            for item in shopping_list:
-                print(f"- {item}")
-        else:
-            print("Your shopping list is empty.")
-
-    elif choice == "done":
-        print("Goodbye! Happy shopping.")
-        break
-
-    else:
-        print("Please choose add, remove, show, or done.")
-
-# --- list_report.py ---
-items = ["bread", "avocado", "milk", "sweet potatoes", "tea"]
-
-print("Numbered items:")
-for index, item in enumerate(items, start=1):
-    print(f"{index}. {item}")
-
-long_names_count = 0
-for item in items:
-    if len(item) > 4:
-        long_names_count += 1
-
-print("Items with more than 4 letters:", long_names_count)
-
-longest_item = items[0]
-for item in items:
-    if len(item) > len(longest_item):
-        longest_item = item
-
-print("Longest item name:", longest_item)
+-- Insert each order's individual products.
+INSERT INTO OrderItems (OrderID, Product, Quantity) VALUES
+    (1001, 'Notebook', 2),
+    (1001, 'Pen', 5),
+    (1002, 'Backpack', 1),
+    (1002, 'Notebook', 3);
